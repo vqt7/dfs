@@ -1,33 +1,66 @@
-#include<stdio.h>
-int a[20][20],reach[20],n;
+#include <stdio.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+
+int a[20][20], reach[20], n;
+
 void dfs(int v) {
-	int i;
-	reach[v]=1;
-	for (i=1;i<=n;i++)
-	  if(a[v][i] && !reach[i]) {
-		printf("\n %d->%d",v,i);
-		dfs(i);
-	}
+    int i;
+    reach[v] = 1;
+
+    for (i = 1; i <= n; i++)
+        if (a[v][i] && !reach[i]) {
+            printf("\n %d->%d", v, i);
+            dfs(i);
+        }
 }
-void main() {
-	int i,j,v,count=0;
-	printf("\n Enter number of vertices:");
-	scanf("%d",&n);
-	for (i=1;i<=n;i++) {
-		reach[i]=0;
-		for (j=1;j<=n;j++)
-		   a[i][j]=0;
-	}
-	printf("\n Enter the adjacency matrix:\n");
-	for (i=1;i<=n;i++)
-	  for (j=1;j<=n;j++)
-	   scanf("%d",&a[i][j]);
-	printf("Enter the source vertex:\n");
-        scanf("%d",&v);
-         dfs(v);
-	printf("\n");
-	for (i=1;i<=n;i++) {
-		if(reach[i])
-		   count++;
-	}
+
+int main(int argc, char **argv) {
+    int i, j, count = 0;
+    int source;
+
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+
+    struct rusage usage_start, usage_end;
+    getrusage(RUSAGE_SELF, &usage_start);
+
+    printf("\n Enter number of systems:");
+    scanf("%d", &n);
+
+    printf("\n Enter the adjacency matrix:\n");
+
+    for (i = 1; i <= n; i++) {
+        reach[i] = 0;
+        for (j = 1; j <= n; j++)
+            scanf("%d", &a[i][j]);
+    }
+
+    printf("\n Enter the source vertex: ");
+    scanf("%d", &source);
+
+    dfs(source);
+
+    printf("\n");
+
+    for (i = 1; i <= n; i++) {
+        if (reach[i])
+            count++;
+    }
+
+    if (count == n)
+        printf("\n Graph is connected");
+    else
+        printf("\n Graph is not connected");
+
+    gettimeofday(&end, NULL);
+    getrusage(RUSAGE_SELF, &usage_end);
+
+    long time_taken_seconds = (end.tv_sec - start.tv_sec);
+    long time_taken_microseconds = (end.tv_usec - start.tv_usec);
+    printf("\nTime taken: %ld seconds %ld microseconds\n", time_taken_seconds, time_taken_microseconds);
+
+    printf("Space used: %ld kilobytes\n", usage_end.ru_maxrss);
+
+    return 0;
 }
